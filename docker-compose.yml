@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  gym:
+    build: .
+    ports:
+      - "7777:8888"
+    volumes:
+    - ./:/src
