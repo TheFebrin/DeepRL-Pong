@@ -8,3 +8,7 @@ git clone https://github.com/openai/gym
 ```
 cd gym && pip install -e .
 ```
+or
+```
+pip install gym
+```
