@@ -1,4 +1,5 @@
 numpy
+numba
 matplotlib
 pandas
 jupyter
@@ -6,3 +7,4 @@ torch
 torchvision
 comet-ml
 opencv-python
+tqdm
