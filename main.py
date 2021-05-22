@@ -7,56 +7,56 @@ import matplotlib.pyplot as plt
 import numba
 # @numba.jit(nopython=True)
 
-from enum import Enum
 from tqdm import tqdm
 from typing import *
 
 from utils.phi import phi
-from utils.action import Action
 from utils.memory import ReplayMemory
-from utils.utils import epsilon_schedule
+from utils.utils import (
+    epsilon_schedule,
+    select_random_action,
+    action_from_model_prediction,
+    action_from_trinary_to_env,
+)
 from models.model import Model
 from models.dqn_model import DQN
 
 
-# TODO: (Dawid) Take those params from argparse or json/yaml config.
-N: int     = 10       # capacity of memory D
-M: int     = 5        # number of episodes in the loop
-T: int     = 5        # TODO
-
-
-
 def train(
-    model: Model,
-    minibatch_size: int = 32,
-    eps: float = 1.0     # probability to select a random action
+    n_games,                # type: int
+    optimizer,              # type: torch.optim
+    memory,                 # type: ReplayMemory
+    model,                  # type: Model
+    minibatch_size = 32,    # type: int
+    eps            = 1.0,   # type: float
+    gamma          = 0.90,  # type: float
 ):
-    memory = ReplayMemory(capacity=N)
+    """
+    :param eps: probability to select a random action
+    """
     env: gym.wrappers.time_limit.TimeLimit = gym.make("Pong-v0")
-    observation: np.ndarray = env.reset()  # reset environment back to its first state
     done: bool = False
     score: int = 0
     total_steps: int = 0
+    loss_history: List[float] = []
 
-    for episode in range(M):
+    for episode in tqdm(range(n_games)):
+        observation: np.ndarray = env.reset()  # reset environment back to its first state
         sequence: List[np.ndarray] = [observation]
         preprocessed_sequence: np.ndarray = phi(sequence)  # 84 x 84 x 4
+        done: bool = False
 
-        for t in range(T):
-            eps = epsilon_schedule(eps, n_frames=1000000)
+        # start one game
+        while not done:
+            eps = epsilon_schedule(eps, n_frames=100000)
             if np.random.rand() < eps:  # with probability eps select a random action
-                action: Action = Action.select_random()
+                action: int = select_random_action()
             else:
-                preprocessed_sequence_tensor = torchvision.transforms.ToTensor()(
-                    preprocessed_sequence)  # Note: It will normalize the pixels [0, 1] and do .permute(2, 0, 1)
-
-                logits: torch.tensor = model(
-                    x=preprocessed_sequence_tensor.view(1, *preprocessed_sequence_tensor.shape)
-                )
-                action = Action.from_model_prediction(x=logits)
+                logits: torch.tensor = model.forward_np_array(x=preprocessed_sequence)
+                action: int = action_from_model_prediction(x=logits)
 
             # Execute action in emulator and observe reward and next frame
-            observation, reward, done, info = env.step(action.value)
+            observation, reward, done, info = env.step(action_from_trinary_to_env(action))
 
             sequence.append(observation)
             sequence = sequence[-4:]  # we need only the last 4 observations
@@ -70,16 +70,48 @@ def train(
             )
             preprocessed_sequence = new_preprocessed_sequence
 
-            minibatch: List[Tuple[np.ndarray, np.ndarray, Action, int]] = memory.sample_random_minibatch(k=minibatch_size)
-            print(len(memory.memory))
-
+            loss = model.gradient_update(
+                optimizer=optimizer,
+                gamma=gamma,
+                batch=memory.sample_random_minibatch(
+                    k=minibatch_size
+                )
+            )
+            loss_history.append(loss)
             total_steps += 1
             # End of the for loop
 
+    print('Training finished.')
+    print(f'Total steps: {total_steps}')
+    plt.figure(figsize=(15, 5))
+    plt.plot(loss_history)
+    plt.show()
 
 def main() -> int:
+    # TODO: (Dawid) Take those params from argparse or json/yaml config.
+    N: int = 10  # capacity of memory D
+    M: int = 5   # number of episodes in the loop
+    T: int = 5
+    learning_rate: float = 0.0001
+
+    memory = ReplayMemory(capacity=N)
+
+    model = DQN(
+        in_channels=4,
+        out_dim=3,
+    )
+
+    optimizer = torch.optim.Adam(
+        lr=learning_rate,
+        betas=(0.9, 0.999), eps=1e-8, amsgrad=False,
+        params=model.parameters()
+    )
+
     train(
-        model=DQN()
+        n_games=M,
+        memory=memory,
+        optimizer=optimizer,
+        model=model,
     )
 
 

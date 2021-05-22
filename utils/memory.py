@@ -1,8 +1,7 @@
-from typing import Tuple
-
+import random
 import numpy as np
+from typing import Tuple, List
 
-from utils.action import Action
 
 class ReplayMemory:
     """
@@ -17,7 +16,7 @@ class ReplayMemory:
         self,
         prev_preprocessed_sequence: np.ndarray,
         preprocessed_sequence: np.ndarray,
-        action: Action,
+        action: int,
         reward: int,
     ):
         self.memory.append((prev_preprocessed_sequence, preprocessed_sequence, action, reward))
@@ -26,8 +25,9 @@ class ReplayMemory:
 
     def sample_random_minibatch(
         self, k: int
-    ) -> Tuple[np.ndarray, np.ndarray, Action, int]:
+    ) -> List[Tuple[np.ndarray, np.ndarray, int, int]]:
         """
-        Sample a random minibatch of size k from the memory
+        Sample a random minibatch of size min(k, size of memory) from the memory.
         """
-        pass
+        k = min(k, len(self.memory))
+        return random.sample(self.memory, k)

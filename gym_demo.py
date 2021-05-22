@@ -10,12 +10,12 @@ print(env.unwrapped.get_action_meanings())
 print('Observation space: ', env.observation_space)
 
 while not done:
-    env.render()
+    # env.render()
     action = env.action_space.sample()  # your agent here (this takes random actions)
-    observation, reward, done, info = env.step(action)
+    observation, reward, done, info = env.step(0)
     score += reward
 
-    # print(action, reward, done, info)
+    print(action, reward, done, info)
 
     if done:
         observation = env.reset()
