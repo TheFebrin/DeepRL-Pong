@@ -24,8 +24,7 @@ class ReplayMemory:
             self.memory = self.memory[1:]
 
     def sample_random_minibatch(
-        self, k: int
-    ) -> List[Tuple[np.ndarray, np.ndarray, int, int]]:
+            self, k: int) -> List[Tuple[np.ndarray, np.ndarray, int, int]]:
         """
         Sample a random minibatch of size min(k, size of memory) from the memory.
         """

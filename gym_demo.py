@@ -11,7 +11,8 @@ print('Observation space: ', env.observation_space)
 
 while not done:
     # env.render()
-    action = env.action_space.sample()  # your agent here (this takes random actions)
+    action = env.action_space.sample(
+    )  # your agent here (this takes random actions)
     observation, reward, done, info = env.step(action)
     score += reward
 
