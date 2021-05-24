@@ -8,3 +8,4 @@ torchvision
 comet-ml
 opencv-python
 tqdm
+gym[atari]
