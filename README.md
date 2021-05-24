@@ -8,7 +8,21 @@ Deep Reinforcement Learning bot playing Pong game.
 --------------
 ## Quick start
 
-Nice virtualenv tutorial [here](https://computingforgeeks.com/fix-mkvirtualenv-command-not-found-ubuntu/)
+### Environment
+
+#### Using docker
+
+You can run the environment using provided Dockerfile,
+
+```
+docker compose up
+```
+
+after that Jupyter Notebook will be run at `localhost:7777`.
+
+#### Building environment locally
+
+You can also build the environment locally. All packages needed to run our code are listed in the `requirements.txt` file. It's convenient to use virtualenv, nice virtualenv tutorial [here](https://computingforgeeks.com/fix-mkvirtualenv-command-not-found-ubuntu/)
 ```bash
 which python3.8
 mkvirtualenv -p <path to python3> <name>
@@ -18,18 +32,6 @@ workon <name>
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-[OpenAI Gym](https://github.com/openai/gym)
-
-```
-git clone https://github.com/openai/gym
-cd gym && pip install -e .
-```
-or
-```
-pip install gym
-pip install gym[atari]
 ```
 
 Downloading ROM (https://github.com/openai/atari-py#roms):

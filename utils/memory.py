@@ -14,12 +14,12 @@ class ReplayMemory:
 
     def store(
         self,
-        prev_preprocessed_sequence: np.ndarray,
-        preprocessed_sequence: np.ndarray,
+        prev_phi_value: np.ndarray,
+        phi_value: np.ndarray,
         action: int,
         reward: int,
     ):
-        self.memory.append((prev_preprocessed_sequence, preprocessed_sequence, action, reward))
+        self.memory.append((prev_phi_value, phi_value, action, reward))
         if len(self.memory) > self.capacity:
             self.memory = self.memory[1:]
 

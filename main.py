@@ -10,7 +10,10 @@ import numba
 from tqdm import tqdm
 from typing import *
 
-from utils.phi import phi
+from utils.phi import (
+    phi,
+    preprocess,
+)
 from utils.memory import ReplayMemory
 from utils.utils import (
     epsilon_schedule,
@@ -42,8 +45,8 @@ def train(
 
     for episode in tqdm(range(n_games)):
         observation: np.ndarray = env.reset()  # reset environment back to its first state
-        sequence: List[np.ndarray] = [observation]
-        preprocessed_sequence: np.ndarray = phi(sequence)  # 84 x 84 x 4
+        preprocessed_sequence: List[np.ndarray] = [preprocess(observation)]
+        phi_value: np.ndarray = phi(sequence)  # 84 x 84 x 4
         done: bool = False
 
         # start one game
@@ -52,23 +55,26 @@ def train(
             if np.random.rand() < eps:  # with probability eps select a random action
                 action: int = select_random_action()
             else:
-                logits: torch.tensor = model.forward_np_array(x=preprocessed_sequence)
+                logits: torch.tensor = model.forward_np_array(x=phi_value)
                 action: int = action_from_model_prediction(x=logits)
 
             # Execute action in emulator and observe reward and next frame
             observation, reward, done, info = env.step(action_from_trinary_to_env(action))
 
-            sequence.append(observation)
-            sequence = sequence[-4:]  # we need only the last 4 observations
-            new_preprocessed_sequence = phi(sequence)
+            if not done:
+                preprocessed_sequence.append(preprocess(observation))
+                preprocessed_sequence = preprocessed_sequence[-4:]  # we need only the last 4 observations
+                new_phi_value = phi(preprocessed_sequence)
+            else:
+                new_phi_value = None
 
             memory.store(
-                prev_preprocessed_sequence=preprocessed_sequence,
-                preprocessed_sequence=new_preprocessed_sequence,
+                prev_phi_value=phi_value,
+                phi_value=new_phi_value,
                 action=action,
                 reward=reward
             )
-            preprocessed_sequence = new_preprocessed_sequence
+            phi_value = new_phi_value
 
             loss = model.gradient_update(
                 optimizer=optimizer,

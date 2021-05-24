@@ -75,9 +75,7 @@ class DQN(Model):
             x=np.array([x[0] for x in batch])
         )
 
-        labels = self.forward_np_array(
-            x=np.array([x[0] for x in batch])
-        ).detach()
+        labels = preds.clone().detach()
 
         next_frames_preds = self.forward_np_array(
             x=np.array([x[1] for x in batch])
@@ -85,7 +83,7 @@ class DQN(Model):
 
         for i, b in enumerate(batch):
             frame, next_frame, action, reward = b
-            if reward != 0.0:  # is it terminal state
+            if next_frame is None:  # is it terminal state
                 labels[i][action] = reward
             else:
                 labels[i][action] = reward + gamma * max(next_frames_preds[i])
