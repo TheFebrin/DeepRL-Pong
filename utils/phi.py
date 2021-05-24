@@ -4,9 +4,7 @@ import numpy as np
 import cv2
 
 
-def preprocess(
-    image: np.ndarray
-) -> np.ndarray:
+def preprocess(image: np.ndarray) -> np.ndarray:
     """
     Preprocessing the raw Atari frames. Converting to grayscale,
     downsampling and cropping image
@@ -21,9 +19,7 @@ def preprocess(
     return cropped
 
 
-def phi(
-    state: List[np.ndarray]
-) -> np.ndarray:
+def phi(state: List[np.ndarray]) -> np.ndarray:
     """
     Preprocess the last 4 frames of a history.
     Stack them to produce the input to the Q-function

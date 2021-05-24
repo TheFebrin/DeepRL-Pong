@@ -11,15 +11,23 @@ from models.model import Model
 class DQN(Model):
 
     def __init__(
-        self, in_channels=4, out_dim=3,
+        self,
+        in_channels=4,
+        out_dim=3,
         criterion=None,
     ):
         super(DQN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=(8, 8), stride=4),
+            nn.Conv2d(in_channels=in_channels,
+                      out_channels=16,
+                      kernel_size=(8, 8),
+                      stride=4),
             # nn.MaxPool2d(kernel_size=(2, 2)),
             nn.ReLU(),
-            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(4, 4), stride=2),
+            nn.Conv2d(in_channels=16,
+                      out_channels=32,
+                      kernel_size=(4, 4),
+                      stride=2),
             nn.ReLU(),
             # nn.MaxPool2d(kernel_size=(2, 2)),  # TODO: Experiment with MaxPool
         )
@@ -35,7 +43,6 @@ class DQN(Model):
         else:
             self.criterion = criterion
 
-
     def forward(self, x: torch.tensor):
         x = self.conv_layers(x)
         x = torch.flatten(x, 1)
@@ -46,9 +53,7 @@ class DQN(Model):
         return x
 
     def _preprocess_array(
-        self,
-        x: Union[np.ndarray, List[np.ndarray]]
-    ) -> torch.tensor:
+            self, x: Union[np.ndarray, List[np.ndarray]]) -> torch.tensor:
         x = torch.tensor(x, dtype=torch.float32) / 255.0
         if len(x.shape) == 3:
             x = x.permute(2, 0, 1)
@@ -60,26 +65,18 @@ class DQN(Model):
         return x
 
     def forward_np_array(self, x: np.ndarray) -> torch.tensor:
-        return self.forward(
-            x=self._preprocess_array(x=x)
-        )
+        return self.forward(x=self._preprocess_array(x=x))
 
     def gradient_update(
-        self,
-        optimizer,
-        gamma: float,
-        batch: List[Tuple[np.ndarray, np.ndarray, int, int]]
-    ) -> float:
+            self, optimizer, gamma: float,
+            batch: List[Tuple[np.ndarray, np.ndarray, int, int]]) -> float:
         self.train()
-        preds = self.forward_np_array(
-            x=np.array([x[0] for x in batch])
-        )
+        preds = self.forward_np_array(x=np.array([x[0] for x in batch]))
 
         labels = preds.clone().detach()
 
         next_frames_preds = self.forward_np_array(
-            x=np.array([x[1] for x in batch])
-        ).detach()
+            x=np.array([x[1] for x in batch])).detach()
 
         for i, b in enumerate(batch):
             frame, next_frame, action, reward = b
