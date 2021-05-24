@@ -37,5 +37,5 @@ def phi(
     if len(state) < 4:
         state = [state[0].copy() for _ in range(4 - len(state))] + state
 
-    preprocessed_state = np.stack(state), axis=2)
+    preprocessed_state = np.stack(state, axis=2)
     return preprocessed_state
