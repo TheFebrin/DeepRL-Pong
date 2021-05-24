@@ -28,7 +28,7 @@ def phi(
     Preprocess the last 4 frames of a history.
     Stack them to produce the input to the Q-function
    
-    param: state: The last 4 (or less) raw Atari frames
+    param: state: The last 4 (or less) preprocess Atari frames
                   In order: oldest to latest (state[-1] is the latest)
     
     return: phi: The last 4 preprocessed Atari frames in np array of shape 84 x 84 x 4
@@ -37,5 +37,5 @@ def phi(
     if len(state) < 4:
         state = [state[0].copy() for _ in range(4 - len(state))] + state
 
-    preprocessed_state = np.stack(list(map(preprocess, state)), axis=2)
+    preprocessed_state = np.stack(state), axis=2)
     return preprocessed_state
