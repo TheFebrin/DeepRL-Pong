@@ -4,6 +4,7 @@ import torch
 import torchvision
 import numpy as np
 import matplotlib.pyplot as plt
+import yaml
 import numba
 # @numba.jit(nopython=True)
 
@@ -26,13 +27,15 @@ from models.dqn_model import DQN
 
 
 def train(
-    n_games,                # type: int
-    optimizer,              # type: torch.optim
-    memory,                 # type: ReplayMemory
-    model,                  # type: Model
-    minibatch_size = 32,    # type: int
-    eps            = 1.0,   # type: float
-    gamma          = 0.90,  # type: float
+    n_games,                 # type: int
+    optimizer,               # type: torch.optim
+    memory,                  # type: ReplayMemory
+    model,                   # type: Model
+    minibatch_size = 32,     # type: int
+    eps            = 1.0,    # type: float
+    eps_n_frames   = 100000, # type: int
+    gamma          = 0.90,   # type: float
+    frame_skipping = 4,      # type: int
 ):
     """
     :param eps: probability to select a random action
@@ -48,10 +51,10 @@ def train(
         preprocessed_sequence: List[np.ndarray] = [preprocess(observation)]
         phi_value: np.ndarray = phi(preprocessed_sequence)  # 84 x 84 x 4
         done: bool = False
-
+            
         # start one game
         while not done:
-            eps = epsilon_schedule(eps, n_frames=100000)
+            eps = epsilon_schedule(eps, n_frames=eps_n_frames)
             if np.random.rand() < eps:  # with probability eps select a random action
                 action: int = select_random_action()
             else:
@@ -59,7 +62,12 @@ def train(
                 action: int = action_from_model_prediction(x=logits)
 
             # Execute action in emulator and observe reward and next frame
-            observation, reward, done, info = env.step(action_from_trinary_to_env(action))
+            reward = 0.0
+            for _ in range(frame_skipping):
+                observation, partial_reward, done, info = env.step(action_from_trinary_to_env(action))
+                reward += partial_reward
+                if done:
+                    break
 
             if not done:
                 preprocessed_sequence.append(preprocess(observation))
@@ -94,30 +102,31 @@ def train(
     plt.show()
 
 def main() -> int:
-    # TODO: (Dawid) Take those params from argparse or json/yaml config.
-    N: int = 10  # capacity of memory D
-    M: int = 5   # number of episodes in the loop
-    T: int = 5
-    learning_rate: float = 0.0001
+    config = yaml.safe_load(open("config.yml"))
 
-    memory = ReplayMemory(capacity=N)
+    memory = ReplayMemory(capacity=config['N'])
 
     model = DQN(
-        in_channels=4,
-        out_dim=3,
+        in_channels=config['IN_CHANNELS'],
+        out_dim=config['OUT_DIM'],
     )
 
     optimizer = torch.optim.Adam(
-        lr=learning_rate,
+        lr=config['LEARNING_RATE'],
         betas=(0.9, 0.999), eps=1e-8, amsgrad=False,
         params=model.parameters()
     )
 
     train(
-        n_games=M,
+        n_games=config['M'],
         memory=memory,
         optimizer=optimizer,
         model=model,
+        minibatch_size=config['MINIBATCH_SIZE'],
+        eps=config['EPS'],
+        eps_n_frames=config['EPS_N_FRAMES'],
+        gamma=config['GAMMA'],
+        frame_skipping=config['FRAME_SKIPPING'],
     )
 
 

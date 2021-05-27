@@ -1,0 +1,13 @@
+IN_CHANNELS: 4
+OUT_DIM: 3
+MINIBATCH_SIZE: 32
+EPS: 1.0
+EPS_N_FRAMES: 100000
+GAMMA: 0.90
+# capacity of memory D
+N: 10
+# number of episodes in the loop
+M: 5
+#  the agent sees and selects actions on every k'th frame
+FRAME_SKIPPING: 4 
+LEARNING_RATE: 0.0001

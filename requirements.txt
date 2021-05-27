@@ -9,3 +9,4 @@ comet-ml
 opencv-python
 tqdm
 gym[atari]
+pip install pyyaml
