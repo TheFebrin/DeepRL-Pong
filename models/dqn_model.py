@@ -78,7 +78,7 @@ class DQN(Model):
         labels = preds.clone().detach()
 
         next_frames_preds = self.forward_np_array(
-            x=np.array([x[1] for x in batch])
+            x=np.array([x[1] if x[1] is not None else x[0] for x in batch])
         ).detach()
 
         for i, b in enumerate(batch):
