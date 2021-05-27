@@ -46,7 +46,7 @@ def train(
     for episode in tqdm(range(n_games)):
         observation: np.ndarray = env.reset()  # reset environment back to its first state
         preprocessed_sequence: List[np.ndarray] = [preprocess(observation)]
-        phi_value: np.ndarray = phi(sequence)  # 84 x 84 x 4
+        phi_value: np.ndarray = phi(preprocessed_sequence)  # 84 x 84 x 4
         done: bool = False
 
         # start one game
