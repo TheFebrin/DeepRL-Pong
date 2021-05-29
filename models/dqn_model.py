@@ -60,8 +60,7 @@ class DQN(Model):
             x = x.permute(0, 3, 1, 2)
         else:
             raise ValueError(f'Wrong number of shapes: {x.shape}')
-        x.to(device)
-        return x
+        return x.to(device)
 
     def forward_np_array(self, x: np.ndarray, device: str) -> torch.tensor:
         return self.forward(
