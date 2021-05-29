@@ -84,7 +84,7 @@ class DQN(Model):
         labels = labels.to(device)
 
         next_frames_preds = self.forward_np_array(
-            device='cpu',
+            device=device,
             x=np.array([x[1] if x[1] is not None else x[0] for x in batch])
         ).detach()
 
