@@ -35,7 +35,6 @@ class DQN(Model):
         else:
             self.criterion = criterion
 
-
     def forward(self, x: torch.tensor):
         x = self.conv_layers(x)
         x = torch.flatten(x, 1)
@@ -68,7 +67,7 @@ class DQN(Model):
         self,
         optimizer,
         gamma: float,
-        batch: List[Tuple[np.ndarray, np.ndarray, int, int]]
+        batch: List[Tuple[np.ndarray, np.ndarray, int, float]]
     ) -> float:
         self.train()
         preds = self.forward_np_array(

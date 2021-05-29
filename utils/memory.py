@@ -17,7 +17,7 @@ class ReplayMemory:
         prev_phi_value: np.ndarray,
         phi_value: np.ndarray,
         action: int,
-        reward: int,
+        reward: float,
     ):
         self.memory.append((prev_phi_value, phi_value, action, reward))
         if len(self.memory) > self.capacity:
@@ -25,7 +25,7 @@ class ReplayMemory:
 
     def sample_random_minibatch(
         self, k: int
-    ) -> List[Tuple[np.ndarray, np.ndarray, int, int]]:
+    ) -> List[Tuple[np.ndarray, np.ndarray, int, float]]:
         """
         Sample a random minibatch of size min(k, size of memory) from the memory.
         """
