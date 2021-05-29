@@ -33,6 +33,8 @@ def train(
         memory,                  # type: ReplayMemory
         model,                   # type: Model
         comet_ml_tag,            # type: str
+        comet_ml_name,           # type: str
+        experiment,              # type: Experiment
         minibatch_size = 32,     # type: int
         eps            = 1.0,    # type: float
         eps_n_frames   = 10000,  # type: int
@@ -42,11 +44,7 @@ def train(
     """
     :param eps: probability to select a random action
     """
-    experiment = Experiment(
-        api_key=os.environ['COMET_ML_API_KEY'],
-        project_name="deep-rl-pong",
-        workspace="thefebrin",
-    )
+    experiment.set_name(comet_ml_name)
     experiment.add_tag(comet_ml_tag)
     experiment.log_parameters({
         n_games: n_games,
