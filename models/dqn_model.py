@@ -49,6 +49,7 @@ class DQN(Model):
 
     def _preprocess_array(
         self,
+        device: str,
         x: Union[np.ndarray, List[np.ndarray]]
     ) -> torch.tensor:
         x = torch.tensor(x, dtype=torch.float32) / 255.0
@@ -59,25 +60,29 @@ class DQN(Model):
             x = x.permute(0, 3, 1, 2)
         else:
             raise ValueError(f'Wrong number of shapes: {x.shape}')
+        x.to(device)
         return x
 
-    def forward_np_array(self, x: np.ndarray) -> torch.tensor:
+    def forward_np_array(self, x: np.ndarray, device: str) -> torch.tensor:
         return self.forward(
-            x=self._preprocess_array(x=x)
+            x=self._preprocess_array(x=x),
+            device=device,
         )
 
     def gradient_update(
         self,
-        optimizer,
+        device: str,
+        optimizer: torch.optim,
         gamma: float,
         batch: List[Tuple[np.ndarray, np.ndarray, int, float]]
     ) -> float:
         self.train()
         preds = self.forward_np_array(
             x=np.array([x[0] for x in batch])
-        )
+        ).to(device)
 
         labels = preds.clone().detach()
+        labels = labels.to(device)
 
         next_frames_preds = self.forward_np_array(
             x=np.array([x[1] if x[1] is not None else x[0] for x in batch])

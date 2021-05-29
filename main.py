@@ -45,6 +45,7 @@ def main() -> int:
     )
 
     train(
+        device=config['DEVICE'],
         n_games=config['M'],
         memory=memory,
         optimizer=optimizer,
