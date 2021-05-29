@@ -1,5 +1,6 @@
 from comet_ml import Experiment
 import sys
+import os
 import gym
 import torch
 import torchvision
@@ -37,17 +38,25 @@ def main() -> int:
         params=model.parameters()
     )
 
+    experiment = Experiment(
+        api_key=os.environ['COMET_ML_API_KEY'],
+        project_name="deep-rl-pong",
+        workspace="thefebrin",
+    )
+
     train(
         n_games=config['M'],
         memory=memory,
         optimizer=optimizer,
         model=model,
+        experiment=experiment,
         minibatch_size=config['MINIBATCH_SIZE'],
         eps=config['EPS'],
         eps_n_frames=config['EPS_N_FRAMES'],
         gamma=config['GAMMA'],
         frame_skipping=config['FRAME_SKIPPING'],
         comet_ml_tag=config['COMET_ML_TAG'],
+        comet_ml_name=config['COMET_ML_NAME'],
     )
 
 
