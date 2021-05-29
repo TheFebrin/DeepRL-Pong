@@ -65,8 +65,7 @@ class DQN(Model):
 
     def forward_np_array(self, x: np.ndarray, device: str) -> torch.tensor:
         return self.forward(
-            x=self._preprocess_array(x=x),
-            device=device,
+            x=self._preprocess_array(device=device, x=x),
         )
 
     def gradient_update(
