@@ -10,3 +10,5 @@ FRAME_SKIPPING: 4  # the agent sees and selects actions on every k'th frame
 LEARNING_RATE: 0.0001
 COMET_ML_TAG: my_training  # tag of the training visible in comet.ml
 COMET_ML_NAME: my_name  # name of the comet.ml training
+COMET_ML_PROJECT_NAME: deep-rl-pong
+COMET_ML_WORKSPACE: thefebrin

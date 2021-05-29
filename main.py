@@ -40,8 +40,8 @@ def main() -> int:
 
     experiment = Experiment(
         api_key=os.environ['COMET_ML_API_KEY'],
-        project_name="deep-rl-pong",
-        workspace="thefebrin",
+        project_name=config['COMET_ML_PROJECT_NAME'],
+        workspace=config['COMET_ML_WORKSPACE'],
     )
 
     train(
