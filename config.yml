@@ -5,11 +5,13 @@ MINIBATCH_SIZE: 32
 EPS: 1.0
 EPS_N_FRAMES: 100000
 GAMMA: 0.90
-N: 10  # capacity of memory D
-M: 5  # number of episodes in the loop
+N: 10000    # capacity of memory D
+M: 1000000  # number of episodes in the loop
 FRAME_SKIPPING: 4  # the agent sees and selects actions on every k'th frame
 LEARNING_RATE: 0.0001
 COMET_ML_TAG: my_training  # tag of the training visible in comet.ml
 COMET_ML_NAME: my_name  # name of the comet.ml training
 COMET_ML_PROJECT_NAME: deep-rl-pong
 COMET_ML_WORKSPACE: thefebrin
+SAVE_MODEL_EVERY: 50  # save model every X episodes
+SAVE_AVERAGE_METRICS_EVERY: 10  # average metrics from past X episodes
