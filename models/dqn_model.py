@@ -78,13 +78,15 @@ class DQN(Model):
     ) -> float:
         self.train()
         preds = self.forward_np_array(
+            device=device,
             x=np.array([x[0] for x in batch])
-        ).to(device)
+        )
 
         labels = preds.clone().detach()
         labels = labels.to(device)
 
         next_frames_preds = self.forward_np_array(
+            device='cpu',
             x=np.array([x[1] if x[1] is not None else x[0] for x in batch])
         ).detach()
 
