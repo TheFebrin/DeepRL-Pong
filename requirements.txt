@@ -10,3 +10,4 @@ opencv-python
 tqdm
 gym[atari]
 pyyaml
+comet_ml
