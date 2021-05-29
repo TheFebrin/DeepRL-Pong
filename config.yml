@@ -9,8 +9,8 @@ N: 10000    # capacity of memory D
 M: 1000000  # number of episodes in the loop
 FRAME_SKIPPING: 4  # the agent sees and selects actions on every k'th frame
 LEARNING_RATE: 0.0001
-COMET_ML_TAG: my_training  # tag of the training visible in comet.ml
-COMET_ML_NAME: my_name  # name of the comet.ml training
+COMET_ML_TAG: gpu_training_1  # tag of the training visible in comet.ml
+COMET_ML_NAME: dawid  # name of the comet.ml training
 COMET_ML_PROJECT_NAME: deep-rl-pong
 COMET_ML_WORKSPACE: thefebrin
 SAVE_MODEL_EVERY: 50  # save model every X episodes
