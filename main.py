@@ -45,6 +45,7 @@ def main() -> int:
     )
 
     train(
+        device=config['DEVICE'],
         n_games=config['M'],
         memory=memory,
         optimizer=optimizer,
@@ -57,6 +58,8 @@ def main() -> int:
         frame_skipping=config['FRAME_SKIPPING'],
         comet_ml_tag=config['COMET_ML_TAG'],
         comet_ml_name=config['COMET_ML_NAME'],
+        save_model_every=config['SAVE_MODEL_EVERY'],
+        save_average_metrics_every=config['SAVE_AVERAGE_METRICS_EVERY'],
     )
 
 

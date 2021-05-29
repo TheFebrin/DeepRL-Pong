@@ -28,10 +28,11 @@ from models.model import Model
 
 
 def train(
-        n_games,                      # type: int
-        optimizer,                    # type: torch.optim
-        memory,                       # type: ReplayMemory
-        model,                        # type: Model
+        device,                        # type: str
+        n_games,                       # type: int
+        optimizer,                     # type: torch.optim
+        memory,                        # type: ReplayMemory
+        model,                         # type: Model
         comet_ml_tag,                  # type: str
         comet_ml_name,                 # type: str
         experiment,                    # type: Experiment
@@ -47,6 +48,9 @@ def train(
     :param eps: probability to select a random action
     :param save_model_every: save model every X episodes
     """
+    if not torch.cuda.is_available():
+        print('Cuda not available. Switching device to cpu.')
+        device = 'cpu'
     experiment.set_name(comet_ml_name)
     experiment.add_tag(comet_ml_tag)
     experiment.log_parameters({
@@ -60,10 +64,12 @@ def train(
     experiment.set_model_graph(str(model))
 
     env: gym.wrappers.time_limit.TimeLimit = gym.make("Pong-v0")
-    total_steps: int = 0
 
+    total_steps: int = 0
     episode_rewad: int = 0
     maximum_actions_values_sum: float = 0
+
+    model.to(device)
     for episode in tqdm(range(n_games)):
         experiment.log_current_epoch(episode)
         observation: np.ndarray = env.reset()  # reset environment back to its first state
@@ -79,10 +85,10 @@ def train(
             if np.random.rand() < eps:  # with probability eps select a random action
                 action: int = select_random_action()
             else:
-                logits: torch.tensor = model.forward_np_array(x=phi_value)
+                logits: torch.tensor = model.forward_np_array(x=phi_value, device=device)
                 action: int = action_from_model_prediction(x=logits)
-                maximum_actions_values_sum += logits.detach().numpy().max()
-                episode_action_values += logits.detach().numpy()
+                maximum_actions_values_sum += logits.detach().cpu().numpy().max()
+                episode_action_values += logits.detach().cpu().numpy()
 
             # Execute action in emulator and observe reward and next frame
             reward: float = 0.0
@@ -108,6 +114,7 @@ def train(
             phi_value = new_phi_value
 
             loss = model.gradient_update(
+                device=device,
                 optimizer=optimizer,
                 gamma=gamma,
                 batch=memory.sample_random_minibatch(
