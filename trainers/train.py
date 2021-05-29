@@ -28,19 +28,20 @@ from models.model import Model
 
 
 def train(
-        n_games,                 # type: int
-        optimizer,               # type: torch.optim
-        memory,                  # type: ReplayMemory
-        model,                   # type: Model
-        comet_ml_tag,            # type: str
-        comet_ml_name,           # type: str
-        experiment,              # type: Experiment
-        minibatch_size = 32,     # type: int
-        eps            = 1.0,    # type: float
-        eps_n_frames   = 10000,  # type: int
-        gamma          = 0.90,   # type: float
-        frame_skipping = 4,      # type: int
-        save_model_every = 50,   # type: int
+        n_games,                      # type: int
+        optimizer,                    # type: torch.optim
+        memory,                       # type: ReplayMemory
+        model,                        # type: Model
+        comet_ml_tag,                  # type: str
+        comet_ml_name,                 # type: str
+        experiment,                    # type: Experiment
+        minibatch_size=32,             # type: int
+        eps=1.0,                       # type: float
+        eps_n_frames=10000,            # type: int
+        gamma=0.90,                    # type: float
+        frame_skipping=4,              # type: int
+        save_model_every=50,           # type: int
+        save_average_metrics_every=10  # type: int
 ):
     """
     :param eps: probability to select a random action
@@ -61,6 +62,8 @@ def train(
     env: gym.wrappers.time_limit.TimeLimit = gym.make("Pong-v0")
     total_steps: int = 0
 
+    episode_rewad: int = 0
+    maximum_actions_values_sum: float = 0
     for episode in tqdm(range(n_games)):
         experiment.log_current_epoch(episode)
         observation: np.ndarray = env.reset()  # reset environment back to its first state
@@ -68,9 +71,7 @@ def train(
         phi_value: np.ndarray = phi(preprocessed_sequence)  # 84 x 84 x 4
         done: bool = False
         episode_steps: int = 0
-        episode_rewad: int = 0
         episode_action_values: np.ndarray = np.zeros((1, 3))
-        maximum_actions_values_sum: float = 0
 
         # start one game
         while not done:
@@ -121,18 +122,25 @@ def train(
         experiment.log_metric(
             "steps_per_episode", episode_steps, step=episode
         )
-        experiment.log_metric(
-            "average_episode_reward", episode_rewad / episode_steps, step=episode
-        )
-        experiment.log_metric(
-            "average_episode_maximum_actions_values", maximum_actions_values_sum / episode_steps, step=episode
-        )
-        plt.bar(['NOOP', 'UP', 'DOWN'], (episode_action_values / episode_steps).ravel())
-        experiment.log_figure(
-           figure_name="average_episode_action_values", figure=plt, step=episode
-        )
         if episode % save_model_every == 0:
             model.save_model(path=f'models/model_episode_{episode}.pth')
+        if episode % save_average_metrics_every == 0:
+            plt.bar(['NOOP', 'UP', 'DOWN'], (episode_action_values / episode_steps).ravel())
+            experiment.log_figure(
+                figure_name="average_episode_action_values", figure=plt, step=episode
+            )
+            experiment.log_metric(
+                "average_episode_reward",
+                episode_rewad / save_average_metrics_every,
+                step=episode
+            )
+            experiment.log_metric(
+                "average_episode_maximum_actions_values",
+                maximum_actions_values_sum / save_average_metrics_every,
+                step=episode
+            )
+            episode_rewad = 0
+            maximum_actions_values_sum = 0
 
     print('Training finished.')
     print(f'Total steps: {total_steps}')
