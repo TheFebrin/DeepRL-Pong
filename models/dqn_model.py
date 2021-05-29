@@ -44,6 +44,9 @@ class DQN(Model):
         """
         return x
 
+    def save_model(self, path: str) -> None:
+        torch.save(self.state_dict(), path)
+
     def _preprocess_array(
         self,
         x: Union[np.ndarray, List[np.ndarray]]

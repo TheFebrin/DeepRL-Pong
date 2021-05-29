@@ -40,9 +40,11 @@ def train(
         eps_n_frames   = 10000,  # type: int
         gamma          = 0.90,   # type: float
         frame_skipping = 4,      # type: int
+        save_model_every = 50,   # type: int
 ):
     """
     :param eps: probability to select a random action
+    :param save_model_every: save model every X episodes
     """
     experiment.set_name(comet_ml_name)
     experiment.add_tag(comet_ml_tag)
@@ -129,6 +131,8 @@ def train(
         experiment.log_figure(
            figure_name="average_episode_action_values", figure=plt, step=episode
         )
+        if episode % save_model_every == 0:
+            model.save_model(path=f'models/model_episode_{episode}.pth')
 
     print('Training finished.')
     print(f'Total steps: {total_steps}')
