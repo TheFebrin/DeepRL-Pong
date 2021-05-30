@@ -132,6 +132,7 @@ def train(
         if episode % save_model_every == 0:
             model.save_model(path=f'models/model_episode_{episode}.pth')
         if episode % save_average_metrics_every == 0:
+            plt.clf()
             plt.bar(['NOOP', 'UP', 'DOWN'], (episode_action_values / episode_steps).ravel())
             experiment.log_figure(
                 figure_name="average_episode_action_values", figure=plt, step=episode
