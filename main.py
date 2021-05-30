@@ -33,7 +33,7 @@ def main() -> int:
             out_dim=config['OUT_DIM'],
         )
         model_name = config['LOAD_MODEL']
-        model.load_state_dict(torch.load(f'/models/{model_name}'))
+        model.load_state_dict(torch.load(f'models/{model_name}'))
     else:
         model = DQN(
             in_channels=config['IN_CHANNELS'],
