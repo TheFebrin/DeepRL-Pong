@@ -15,3 +15,4 @@ COMET_ML_PROJECT_NAME: deep-rl-pong
 COMET_ML_WORKSPACE: thefebrin
 SAVE_MODEL_EVERY: 50  # save model every X episodes
 SAVE_AVERAGE_METRICS_EVERY: 10  # average metrics from past X episodes
+LOAD_MODEL: model_episode_1700.pth  # name of the model to be loaded

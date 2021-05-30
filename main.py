@@ -27,10 +27,18 @@ def main() -> int:
 
     memory = ReplayMemory(capacity=config['N'])
 
-    model = DQN(
-        in_channels=config['IN_CHANNELS'],
-        out_dim=config['OUT_DIM'],
-    )
+    if config['LOAD_MODEL']:
+        model = DQN(
+            in_channels=config['IN_CHANNELS'],
+            out_dim=config['OUT_DIM'],
+        )
+        model_name = config['LOAD_MODEL']
+        model.load_state_dict(torch.load(f'/models/{model_name}'))
+    else:
+        model = DQN(
+            in_channels=config['IN_CHANNELS'],
+            out_dim=config['OUT_DIM'],
+        )
 
     optimizer = torch.optim.Adam(
         lr=config['LEARNING_RATE'],
