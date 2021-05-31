@@ -117,7 +117,7 @@ def train(
             "steps_per_episode", episode_steps, step=episode
         )
         if episode % save_model_every == 0:
-            model.save_model(path=f'models/model_episode_{episode}.pth')
+            model.save_model(path=f'models/model_2_episode_{episode}.pth')
         if episode % save_average_metrics_every == 0:
             plt.clf()
             plt.bar(['NOOP', 'UP', 'DOWN'], (episode_action_values / episode_steps).ravel())
