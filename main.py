@@ -40,17 +40,40 @@ def main() -> int:
             out_dim=config['OUT_DIM'],
         )
 
-    optimizer = torch.optim.Adam(
-        lr=config['LEARNING_RATE'],
-        betas=(0.9, 0.999), eps=1e-8, amsgrad=False,
-        params=model.parameters()
-    )
+    optimizer_name = config['OPTIMIZER']
+    if optimizer_name == 'adam':
+        optimizer = torch.optim.Adam(
+            lr=config['LEARNING_RATE'],
+            betas=(0.9, 0.999), eps=1e-8, amsgrad=False,
+            params=model.parameters()
+        )
+    elif optimizer_name == 'sgd':
+        optimizer = torch.optim.SGD(
+            lr=config['LEARNING_RATE'],
+            momentum=0.9,
+            params=model.parameters()
+        )
+    else:
+        raise ValueError(f'Unknown optimizer name: {optimizer_name}')
 
     experiment = Experiment(
         api_key=os.environ['COMET_ML_API_KEY'],
         project_name=config['COMET_ML_PROJECT_NAME'],
         workspace=config['COMET_ML_WORKSPACE'],
     )
+
+    experiment.set_name(config['COMET_ML_NAME'])
+    experiment.add_tag(config['COMET_ML_TAG'])
+    experiment.log_parameters({
+        'n_games':          config['M'],
+        'minibatch_size':   config['MINIBATCH_SIZE'],
+        'eps':              config['EPS'],
+        'eps_n_frames':     config['EPS_N_FRAMES'],
+        'gamma':            config['GAMMA'],
+        'frame_skipping':   config['FRAME_SKIPPING'],
+        'save_model_every': config['SAVE_MODEL_EVERY']
+    })
+    experiment.set_model_graph(str(model))
 
     train(
         device=config['DEVICE'],
@@ -64,8 +87,6 @@ def main() -> int:
         eps_n_frames=config['EPS_N_FRAMES'],
         gamma=config['GAMMA'],
         frame_skipping=config['FRAME_SKIPPING'],
-        comet_ml_tag=config['COMET_ML_TAG'],
-        comet_ml_name=config['COMET_ML_NAME'],
         save_model_every=config['SAVE_MODEL_EVERY'],
         save_average_metrics_every=config['SAVE_AVERAGE_METRICS_EVERY'],
     )

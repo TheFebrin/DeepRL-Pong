@@ -33,8 +33,6 @@ def train(
         optimizer,                     # type: torch.optim
         memory,                        # type: ReplayMemory
         model,                         # type: Model
-        comet_ml_tag,                  # type: str
-        comet_ml_name,                 # type: str
         experiment,                    # type: Experiment
         minibatch_size=32,             # type: int
         eps=1.0,                       # type: float
@@ -51,17 +49,6 @@ def train(
     if not torch.cuda.is_available():
         print('Cuda not available. Switching device to cpu.')
         device = 'cpu'
-    experiment.set_name(comet_ml_name)
-    experiment.add_tag(comet_ml_tag)
-    experiment.log_parameters({
-        n_games: n_games,
-        minibatch_size: minibatch_size,
-        eps: eps,
-        eps_n_frames: eps_n_frames,
-        gamma: gamma,
-        frame_skipping: frame_skipping,
-    })
-    experiment.set_model_graph(str(model))
 
     env: gym.wrappers.time_limit.TimeLimit = gym.make("Pong-v0")
 

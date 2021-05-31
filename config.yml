@@ -1,18 +1,19 @@
 DEVICE: cuda:7
 IN_CHANNELS: 4
 OUT_DIM: 3
-MINIBATCH_SIZE: 64
+MINIBATCH_SIZE: 32
 EPS: 1.0
-EPS_N_FRAMES: 100000
+EPS_N_FRAMES: 0
 GAMMA: 0.90
 N: 10000    # capacity of memory D
 M: 1000000  # number of episodes in the loop
 FRAME_SKIPPING: 4  # the agent sees and selects actions on every k'th frame
 LEARNING_RATE: 0.0001
-COMET_ML_TAG: gpu_training_1  # tag of the training visible in comet.ml
+OPTIMIZER: sgd
+COMET_ML_TAG: gpu_training_1v3  # tag of the training visible in comet.ml
 COMET_ML_NAME: dawid  # name of the comet.ml training
 COMET_ML_PROJECT_NAME: deep-rl-pong
 COMET_ML_WORKSPACE: thefebrin
 SAVE_MODEL_EVERY: 50  # save model every X episodes
 SAVE_AVERAGE_METRICS_EVERY: 10  # average metrics from past X episodes
-LOAD_MODEL: model_episode_1700.pth  # name of the model to be loaded
+LOAD_MODEL: model_episode_5700.pth  # name of the model to be loaded
