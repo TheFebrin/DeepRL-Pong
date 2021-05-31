@@ -16,16 +16,16 @@ class DQN(Model):
     ):
         super(DQN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=(8, 8), stride=4),
-            # nn.MaxPool2d(kernel_size=(2, 2)),
+            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=(5, 5), stride=1),
+            nn.MaxPool2d(kernel_size=(2, 2)),
             nn.ReLU(),
-            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(4, 4), stride=2),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(5, 5), stride=1),
+            nn.MaxPool2d(kernel_size=(2, 2)),
             nn.ReLU(),
-            # nn.MaxPool2d(kernel_size=(2, 2)),  # TODO: Experiment with MaxPool
         )
 
         self.dense_layers = nn.Sequential(
-            nn.Linear(2592, 256),
+            nn.Linear(10368, 256),
             nn.ReLU(),
             nn.Linear(256, out_dim),
         )
