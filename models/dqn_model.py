@@ -12,10 +12,10 @@ class DQN():
 
     def __init__(
         self, in_channels=4, out_dim=3,
-        criterion=None, model_target=None,
+        criterion=None,
     ):
         self.model = Model(in_channels=in_channels, out_dim=out_dim)
-        self.mode_target = Model(in_channels=in_channels, out_dim=out_dim)
+        self.model_target = Model(in_channels=in_channels, out_dim=out_dim)
         if criterion is None:
             self.criterion = nn.MSELoss()
         else:
@@ -60,15 +60,21 @@ class DQN():
         return self.model.forward_np_array(x=x, device=device)
 
     def update_model_target(self) -> None:
-        self.mode_target.load_state_dict(self.model.state_dict())
+        self.model_target.load_state_dict(self.model.state_dict())
 
     def save_model(self, path: str) -> None:
         torch.save(self.model.state_dict(), path)
 
     def load_model(self, model_name: str) -> None:
-        self.model.load_state_dict(torch.load(f'models/saved_models/{model_name}'))
-        self.target_model.load_state_dict(torch.load(f'models/saved_models/{model_name}'))
+        path = f'models/saved_models/{model_name}'
+        if torch.cuda.is_available():
+            self.model.load_state_dict(torch.load(path))
+            self.model_target.load_state_dict(torch.load(path))
+        else:
+            device = torch.device('cpu')
+            self.model.load_state_dict(torch.load(path, map_location=device))
+            self.model_target.load_state_dict(torch.load(path, map_location=device))
 
     def to(self, device) -> None:
         self.model.to(device)
-        self.target_model.to(device)
+        self.model_target.to(device)

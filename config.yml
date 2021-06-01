@@ -11,7 +11,7 @@ TEST_GAMES: 100
 FRAME_SKIPPING: 4  # the agent sees and selects actions on every k'th frame
 LEARNING_RATE: 0.0001
 OPTIMIZER: sgd
-COMET_ML_TAG: gpu_training_1v3  # tag of the training visible in comet.ml
+COMET_ML_TAG: gpu_training_1v3 # tag of the training visible in comet.ml
 COMET_ML_NAME: dawid  # name of the comet.ml training
 COMET_ML_PROJECT_NAME: deep-rl-pong
 COMET_ML_WORKSPACE: thefebrin
