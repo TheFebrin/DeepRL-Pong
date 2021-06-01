@@ -24,23 +24,24 @@ from utils.utils import (
     action_from_model_prediction,
     action_from_trinary_to_env,
 )
-from models.model import Model
+from models.dqn_model import DQN
 
 
 def train(
-        device,                        # type: str
-        n_games,                       # type: int
-        optimizer,                     # type: torch.optim
-        memory,                        # type: ReplayMemory
-        model,                         # type: Model
-        experiment,                    # type: Experiment
-        minibatch_size=32,             # type: int
-        eps=1.0,                       # type: float
-        eps_n_frames=10000,            # type: int
-        gamma=0.90,                    # type: float
-        frame_skipping=4,              # type: int
-        save_model_every=50,           # type: int
-        save_average_metrics_every=10  # type: int
+        device,                          # type: str
+        n_games,                         # type: int
+        optimizer,                       # type: torch.optim
+        memory,                          # type: ReplayMemory
+        model,                           # type: DQN
+        experiment,                      # type: Experiment
+        minibatch_size=32,               # type: int
+        eps=1.0,                         # type: float
+        eps_n_frames=10000,              # type: int
+        gamma=0.90,                      # type: float
+        frame_skipping=4,                # type: int
+        update_model_target_every=10000, # type: int
+        save_model_every=50,             # type: int
+        save_average_metrics_every=10,   # type: int
 ):
     """
     :param eps: probability to select a random action
@@ -72,7 +73,7 @@ def train(
             if np.random.rand() < eps:  # with probability eps select a random action
                 action: int = select_random_action()
             else:
-                logits: torch.tensor = model.forward_np_array(x=phi_value, device=device)
+                logits: torch.tensor = model.predict(x=phi_value, device=device)
                 action: int = action_from_model_prediction(x=logits)
                 maximum_actions_values_sum += logits.detach().cpu().numpy().max()
                 episode_action_values += logits.detach().cpu().numpy()
@@ -108,6 +109,10 @@ def train(
                     k=minibatch_size
                 )
             )
+
+            if total_steps%update_model_target_every == 0:
+                model.update_model_target()
+
             experiment.log_metric("every_step_loss", loss, step=total_steps)
             episode_rewad += reward
             episode_steps += 1
