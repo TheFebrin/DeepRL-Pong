@@ -21,7 +21,7 @@ class ReplayMemory:
     ):
         self.memory.append((prev_phi_value, phi_value, action, reward))
         if len(self.memory) > self.capacity:
-            self.memory = self.memory[1:]
+            self.memory.pop(0)
 
     def sample_random_minibatch(
         self, k: int
