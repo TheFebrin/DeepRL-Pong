@@ -7,6 +7,7 @@ import torchvision
 import numpy as np
 import matplotlib.pyplot as plt
 import yaml
+import argparse
 import numba
 # @numba.jit(nopython=True)
 
@@ -20,6 +21,10 @@ from trainers.train import train
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--test', help='Test mode', action='store_true')
+    args = parser.parse_args()
+
     config = yaml.safe_load(open("config.yml"))
 
     if config['LOAD_MODEL']:
@@ -35,7 +40,7 @@ def main() -> int:
             out_dim=config['OUT_DIM'],
         )
 
-    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+    if args.test:
         test(
             device=config['DEVICE'],
             n_games=config['TEST_GAMES'],
