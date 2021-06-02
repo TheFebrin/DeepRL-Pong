@@ -31,6 +31,8 @@ def test(
     total_steps: int = 0
     total_rewad: int = 0
     maximum_actions_values_sum: float = 0
+    best_reward: int = -22
+    worst_reward: int = 22
 
     model.to(device)
     for episode in tqdm(range(n_games)):
@@ -63,6 +65,11 @@ def test(
                 new_phi_value = None
 
             phi_value = new_phi_value
+
+            if reward > best_reward:
+                best_reward = reward
+            if reward < worst_reward:
+                worst_reward = reward
             total_rewad += reward
             total_steps += 1
         
@@ -70,5 +77,7 @@ def test(
     print('Testing finished.')
     print(f'Total steps: {total_steps}')
     print(f'Average number of steps per episode: {total_steps/n_games}')
-    print(f'Average reward per episode: {total_rewad/n_games}')
     print(f'Average maximum actions values sum: {maximum_actions_values_sum/total_steps}')
+    print(f'Average reward per episode: {total_rewad/n_games}')
+    print(f'Highest reward: {best_reward}')
+    print(f'Lowest reward {worst_reward}')
