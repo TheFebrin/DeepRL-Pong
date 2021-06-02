@@ -16,13 +16,19 @@ from typing import *
 
 from utils.memory import ReplayMemory
 from utils.test import test
+from utils.demo import demo
 from models.dqn_model import DQN
 from trainers.train import train
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test', help='Test mode', action='store_true')
+    parser.add_argument(
+        '--mode', 
+        help='Select mode', 
+        choices=['train', 'test', 'demo'], 
+        default='train',
+        )
     args = parser.parse_args()
 
     config = yaml.safe_load(open("config.yml"))
@@ -40,10 +46,16 @@ def main() -> int:
             out_dim=config['OUT_DIM'],
         )
 
-    if args.test:
+    if args.mode=='test':
         test(
             device=config['DEVICE'],
             n_games=config['TEST_GAMES'],
+            model=model,
+            frame_skipping=config['FRAME_SKIPPING'],
+        )
+    elif args.mode=='demo':
+        demo(
+            device=config['DEVICE'],
             model=model,
             frame_skipping=config['FRAME_SKIPPING'],
         )
