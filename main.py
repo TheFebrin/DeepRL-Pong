@@ -111,6 +111,7 @@ def main() -> int:
             frame_skipping=config['FRAME_SKIPPING'],
             update_model_target_every=config['UPDATE_MODEL_TARGET_EVERY'],
             save_model_every=config['SAVE_MODEL_EVERY'],
+            save_model_as=config['SAVE_MODEL_AS'],
             save_average_metrics_every=config['SAVE_AVERAGE_METRICS_EVERY'],
         )
 

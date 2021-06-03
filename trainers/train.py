@@ -41,6 +41,7 @@ def train(
         frame_skipping=4,                # type: int
         update_model_target_every=10000, # type: int
         save_model_every=50,             # type: int
+        save_model_as='model_episode',   # type: str
         save_average_metrics_every=10,   # type: int
 ):
     """
@@ -70,6 +71,7 @@ def train(
         # start one game
         while not done:
             eps = epsilon_schedule(eps, n_frames=eps_n_frames)
+            experiment.log_metric("epsilon", eps, step=total_steps)
             if np.random.rand() < eps:  # with probability eps select a random action
                 action: int = select_random_action()
             else:
@@ -110,20 +112,22 @@ def train(
                 )
             )
 
-            if total_steps%update_model_target_every == 0:
+            if (total_steps + 1) % update_model_target_every == 0:
                 model.update_model_target()
 
             experiment.log_metric("every_step_loss", loss, step=total_steps)
             episode_rewad += reward
             episode_steps += 1
             total_steps += 1
+
         # End of the game
         experiment.log_metric(
             "steps_per_episode", episode_steps, step=episode
         )
-        if episode % save_model_every == 0:
-            model.save_model(path=f'models/model_episode_{episode}.pth')
-        if episode % save_average_metrics_every == 0:
+        if (episode + 1) % save_model_every == 0:
+            model.save_model(path=f'models/{save_model_as}_{episode}.pth')
+            torch.save(optimizer.state_dict(), f'models/optimizer_{save_model_as}_{episode}.pth')
+        if (episode + 1) % save_average_metrics_every == 0:
             plt.clf()
             plt.bar(['NOOP', 'UP', 'DOWN'], (episode_action_values / episode_steps).ravel())
             experiment.log_figure(
