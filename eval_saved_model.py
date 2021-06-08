@@ -20,6 +20,9 @@ def parse_args():
         '--n-games', required=True, type=int, help='Number of games to be played.'
     )
     parser.add_argument(
+        '--frame-skipping', required=True, type=int, help='How many frames we want to skip.'
+    )
+    parser.add_argument(
         '--visualize', required=False, default=False, action='store_true', help='Show games.'
     )
     parser.add_argument(
@@ -34,10 +37,11 @@ def main():
     n_games = args.n_games
     visualize = args.visualize
     sleep_duration = args.sleep
+    frame_skipping = args.frame_skipping
 
     print(f'Evaluating model: {model_name} on {n_games} games.')
 
-    model = DQN(in_channels=4, out_dim=3)
+    model = DQN(in_channels=4, out_dim=3).model
     model.load_state_dict(torch.load(f'models/saved_models/{model_name}', map_location=torch.device('cpu')))
 
     env = gym.make("Pong-v0")
@@ -59,7 +63,7 @@ def main():
             action = action_from_model_prediction(x=logits)
 
             reward = 0
-            for _ in range(4):
+            for _ in range(frame_skipping):
                 observation, partial_reward, done, info = env.step(action_from_trinary_to_env(action))
                 reward += partial_reward
                 if done:
@@ -68,7 +72,6 @@ def main():
             score += reward
 
             if done:
-                observation = env.reset()
                 total_score += score
                 scores_history.append(score)
             else:
