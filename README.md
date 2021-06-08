@@ -3,7 +3,8 @@
 
 --------------
 
-![pong-v0](images/pong-v0.png)
+<div style="text-align:center"><img src="images/rl-agent.gif" /></div>
+<div style="text-align:center">(our agent is green)</div>
 
 --------------
 
@@ -55,7 +56,7 @@ Downloading ROM (https://github.com/openai/atari-py#roms):
 
 ```bash
 unrar x Roms.rar
-unzip ROMS.zip 
+unzip ROMS.zip
 python -m atari_py.import_roms ROMS
 ```
 
@@ -98,6 +99,44 @@ python main.py --mode demo
 ## Training statistics
 During the training model logs all useful statistics to the CometML. You should set up the workspace, project name, tag, and name in the config file. Example of training statistics look like this:
 ![comet](images/comet.png)
+
+## Saved models and Results
+In `/models/saved_models` we keep our models.
+
+1. Our first model was trained with Adam.
+```
+(rl) febrin@laptop:~/Desktop/DeepRL-Pong(master)$ python eval_saved_model.py --model-name model_episode_5700.pth --n-games 100 --frame-skipping 4
+Evaluating model: model_episode_5700.pth on 100 games.
+Validating model...: 100%|████████████████████████████████████████████████████████████████████████| 100/100 [08:11<00:00,  4.92s/it]
+Model: model_episode_5700.pth | n_games: 100 | Average score: -12.13 | Min: -19.0 | Max: -3.0
+```
+
+2. Then we trained it for more games using SGD and gained slightly better results.
+```
+(rl) febrin@laptop:~/Desktop/DeepRL-Pong(master)$ python eval_saved_model.py --model-name model_episode_6350_sgd.pth --n-games 100 --frame-skipping 4
+Evaluating model: model_episode_6350_sgd.pth on 100 games.
+Validating model...: 100%|████████████████████████████████████████████████████████████████████████| 100/100 [07:39<00:00,  4.59s/it]
+Model: model_episode_6350_sgd.pth | n_games: 100 | Average score: -11.83 | Min: -20.0 | Max: 2.0
+```
+
+We changed the architecture. Now the DQN model consists of two models, standard one and a target model.
+More info here: https://towardsdatascience.com/getting-an-ai-to-play-atari-pong-with-deep-reinforcement-learning-47b0c56e78ae
+
+3. Dual model after 4500 games.
+```
+(rl) febrin@laptop:~/Desktop/DeepRL-Pong(master)$ python eval_saved_model.py --model-name model_dual_4500.pth --n-games 100 --frame-skipping 3
+Evaluating model: model_dual_4500.pth on 100 games.
+Validating model...: 100%|████████████████████████████████████████████████████████████████████████| 100/100 [12:00<00:00,  7.21s/it]
+Model: model_dual_4500.pth | n_games: 100 | Average score: -8.15 | Min: -19.0 | Max: 9.0
+```
+
+4. Final dual model after 6200 games performed worst than the one before. Although the winning ratio is not the best the model was doing about 1300-2200 steps per game.
+```
+(rl) febrin@laptop:~/Desktop/DeepRL-Pong(master)$ python eval_saved_model.py --model-name model_dual_6200.pth --n-games 100 --frame-skipping 3
+Evaluating model: model_dual_6200.pth on 100 games.
+Validating model...: 100%|████████████████████████████████████████████████████████████████████████| 100/100 [08:33<00:00,  5.13s/it]
+Model: model_dual_6200.pth | n_games: 100 | Average score: -11.27 | Min: -17.0 | Max: -2.0
+```
 
 ## Status
 Project: _finished_
