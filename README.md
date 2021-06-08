@@ -100,6 +100,8 @@ python main.py --mode demo
 During the training model logs all useful statistics to the CometML. You should set up the workspace, project name, tag, and name in the config file. Example of training statistics look like this:
 ![comet](images/comet.png)
 
+All metrics visible here: https://www.comet.ml/thefebrin/deep-rl-pong/view/new
+
 ## Saved models and Results
 In `/models/saved_models` we keep our models.
 
