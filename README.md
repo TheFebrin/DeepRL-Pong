@@ -97,7 +97,7 @@ python main.py --mode demo
 ```
 
 ## Architecture
-![comet](images/network.png)
+![comet](images/network_architecture.png)
 
 ## Training statistics
 During the training model logs all useful statistics to the CometML. You should set up the workspace, project name, tag, and name in the config file. Example of training statistics look like this:
